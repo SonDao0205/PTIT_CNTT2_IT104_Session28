@@ -1,25 +1,25 @@
 export default function Bai10() {
   const listTasks: string[] = [];
-  const addTask = (
-    nameTask: string,
-    listTask: string[],
-    callback: (error: string) => void
-  ): void => {
-    const exist = listTask.find((element) => element === nameTask);
-    if (exist) return callback("exist");
-    listTask.push(nameTask);
-    return callback("none");
+
+  const addTask = (nameTask: string, listTask: string[]): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const exist = listTask.find((element) => element === nameTask);
+      if (exist) return resolve("exist");
+      listTask.push(nameTask);
+      return resolve("none");
+    });
   };
 
   const deleteTask = (
     nameTask: string,
-    listTask: string[],
-    callback: (error: string) => void
-  ): void => {
-    const taskIndex = listTask.findIndex((element) => element === nameTask);
-    if (taskIndex === -1) return callback("notFound");
-    listTask.splice(taskIndex, 1);
-    return callback("none");
+    listTask: string[]
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const taskIndex = listTask.findIndex((element) => element === nameTask);
+      if (taskIndex === -1) return resolve("notFound");
+      listTask.splice(taskIndex, 1);
+      return resolve("none");
+    });
   };
 
   const displayTask = (listTask: string[]): void => {
@@ -36,8 +36,6 @@ export default function Bai10() {
       case "exist":
         console.log(`Task đã tồn tại`);
         break;
-      default:
-        break;
     }
   };
 
@@ -49,20 +47,25 @@ export default function Bai10() {
       case "notFound":
         console.log(`Không tìm thấy task`);
         break;
-      default:
-        break;
     }
   };
 
-  addTask(`Đi học`, listTasks, addTaskDisplay);
-  addTask(`Đi chơi`, listTasks, addTaskDisplay);
-  addTask(`Đi ngủ`, listTasks, addTaskDisplay);
-  addTask(`Đi ngủ`, listTasks, addTaskDisplay);
-  addTask(`Đi ăn`, listTasks, addTaskDisplay);
-  displayTask(listTasks);
-  deleteTask("Đi chơi", listTasks, deleteTaskDisplay);
-  deleteTask("Đi làm", listTasks, deleteTaskDisplay);
-  displayTask(listTasks);
+  const runTasks = async () => {
+    addTaskDisplay(await addTask("Đi học", listTasks));
+    addTaskDisplay(await addTask("Đi chơi", listTasks));
+    addTaskDisplay(await addTask("Đi ngủ", listTasks));
+    addTaskDisplay(await addTask("Đi ngủ", listTasks));
+    addTaskDisplay(await addTask("Đi ăn", listTasks));
+
+    displayTask(listTasks);
+
+    deleteTaskDisplay(await deleteTask("Đi chơi", listTasks));
+    deleteTaskDisplay(await deleteTask("Đi làm", listTasks));
+
+    displayTask(listTasks);
+  };
+
+  runTasks();
 
   return <div>Bai10</div>;
 }
